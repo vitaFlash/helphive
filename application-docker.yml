@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: ${DB_URL}          # provided by docker-compose
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update      # safer for dev; switch to Flyway later
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+mail:
+  host: ${MAIL_HOST:smtp.gmail.com}
+  port: ${MAIL_PORT:587}
+  username: ${EMAIL}
+  password: ${GMAIL_PASSWORD}
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+
+server:
+  port: 8080

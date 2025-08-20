@@ -1,0 +1,24 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build (tests)
+        run: mvn -q -B -DskipTests=false test
+      - name: Package
+        run: mvn -q -B -DskipTests package
+      - name: Build Docker image
+        run: docker build -t helphive:ci .
+      # To push to Docker Hub/GHCR, add login + push steps with secrets
