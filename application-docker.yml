@@ -11,6 +11,16 @@ spring:
       hibernate:
         format_sql: true
 
+springdoc:
+  api-docs:
+    enabled: true
+    swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    operations-sorter: method
+    tags-sorter: alpha
+
+
 mail:
   host: ${MAIL_HOST:smtp.gmail.com}
   port: ${MAIL_PORT:587}

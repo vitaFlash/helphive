@@ -1,4 +1,4 @@
-package com.hive.help;
+package com.hive.help.config;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
