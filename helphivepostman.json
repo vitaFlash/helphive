@@ -1,0 +1,127 @@
+{
+  "info": {
+    "name": "HelpHive API",
+    "_postman_id": "c9e9b8f2-1234-4a56-9abc-ef1234567890",
+    "description": "Postman collection for HelpHive Ticket Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get all users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Create user",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"secret\"\n}"
+            },
+            "url": "{{baseUrl}}/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "Get all tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/tickets"
+          }
+        },
+        {
+          "name": "Create ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Laptop not working\",\n  \"description\": \"My laptop does not boot\",\n  \"priority\": \"HIGH\",\n  \"creatorId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/tickets"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Create admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SuperAdmin\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": "{{baseUrl}}/admins"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Supervisors",
+      "item": [
+        {
+          "name": "Create supervisor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bob Supervisor\",\n  \"email\": \"supervisor@example.com\",\n  \"password\": \"super123\"\n}"
+            },
+            "url": "{{baseUrl}}/supervisors"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Technicians",
+      "item": [
+        {
+          "name": "Create technician",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tom Tech\",\n  \"email\": \"tech@example.com\",\n  \"password\": \"tech123\"\n}"
+            },
+            "url": "{{baseUrl}}/technicians"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}
