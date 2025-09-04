@@ -43,8 +43,8 @@ public class Ticket {
     @Column(nullable = false, length = 32)
     private TicketPriority priority = TicketPriority.MEDIUM;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
@@ -65,16 +65,14 @@ public class Ticket {
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkLog> workLogs = new ArrayList<>();
 
-    @PreUpdate
-    public void onUpdate() { this.updatedAt = LocalDateTime.now(); }
-
-    public void addComment(Comment comment) {
-        comments.add(comment);
-        comment.setTicket(this);
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
-    public void addWorkLog(WorkLog workLog) {
-        workLogs.add(workLog);
-        workLog.setTicket(this);
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     @Transient
@@ -82,15 +80,10 @@ public class Ticket {
         if (createdAt == null) return TicketColor.GREEN;
 
         long hours = java.time.Duration.between(createdAt, LocalDateTime.now()).toHours();
-
-        if (hours < 24) {
-            return TicketColor.GREEN;
-        } else if (hours <= 48) {
-            return TicketColor.ORANGE;
-        } else {
-            return TicketColor.RED;
-        }
+        if (hours < 24) return TicketColor.GREEN;
+        else if (hours <= 48) return TicketColor.ORANGE;
+        else return TicketColor.RED;
     }
-
 }
+
 

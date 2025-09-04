@@ -25,84 +25,107 @@ public class TicketServiceImpl implements TicketService {
     public TicketDto create(Long creatorId, TicketCreateDto dto) {
         User creator = userRepo.findById(creatorId)
                 .orElseThrow(() -> new NotFoundException("Creator not found"));
-        Ticket t = mapper.toEntity(dto);
-        t.setCreator(creator);
-        return mapper.toDto(repo.save(t));
+        Ticket ticket = mapper.toEntity(dto);
+        ticket.setCreator(creator);
+        return mapper.toDto(repo.save(ticket));
     }
 
     @Override
     public TicketDto get(Long id) {
-        return mapper.toDto(repo.findById(id).orElseThrow(() -> new NotFoundException("Ticket not found")));
+        Ticket ticket = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ticket not found"));
+        return mapper.toDto(ticket);
     }
 
     @Override
     public Page<TicketDto> listAll(int page, int size) {
-        return repo.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending())).map(mapper::toDto);
+        return repo.findAll(pageRequest(page, size))
+                .map(mapper::toDto);
     }
 
     @Override
     public Page<TicketDto> listByCreator(Long creatorId, int page, int size) {
-        return repo.findByCreatorId(creatorId, PageRequest.of(page, size, Sort.by("createdAt").descending()))
+        return repo.findByCreatorId(creatorId, pageRequest(page, size))
                 .map(mapper::toDto);
     }
 
     @Override
     public Page<TicketDto> listByAssignee(Long technicianId, int page, int size) {
-        return repo.findByAssignedTechnicianId(technicianId, PageRequest.of(page, size, Sort.by("createdAt").descending()))
+        return repo.findByAssignedTechnicianId(technicianId, pageRequest(page, size))
                 .map(mapper::toDto);
     }
 
     @Override
     public TicketDto update(Long id, TicketUpdateDto dto) {
-        Ticket t = repo.findById(id).orElseThrow(() -> new NotFoundException("Ticket not found"));
-        mapper.update(t, dto);
-        t.setUpdatedAt(LocalDateTime.now());
-        return mapper.toDto(repo.save(t));
+        Ticket ticket = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ticket not found"));
+        mapper.update(ticket, dto);
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return mapper.toDto(repo.save(ticket));
     }
 
     @Override
     public TicketDto updateStatus(Long id, TicketStatusUpdateDto dto) {
-        Ticket t = repo.findById(id).orElseThrow(() -> new NotFoundException("Ticket not found"));
-        TicketStatus from = t.getStatus();
-        t.setStatus(dto.status());
-        if (from == TicketStatus.OPEN && dto.status() == TicketStatus.IN_PROGRESS && t.getFirstRespondedAt() == null) {
-            t.setFirstRespondedAt(LocalDateTime.now());
+        Ticket ticket = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ticket not found"));
+
+        TicketStatus previousStatus = ticket.getStatus();
+        ticket.setStatus(dto.status());
+
+        if (previousStatus == TicketStatus.OPEN &&
+                dto.status() == TicketStatus.IN_PROGRESS &&
+                ticket.getFirstRespondedAt() == null) {
+            ticket.setFirstRespondedAt(LocalDateTime.now());
         }
-        if (dto.status() == TicketStatus.RESOLVED && t.getResolvedAt() == null) {
-            t.setResolvedAt(LocalDateTime.now());
+
+        if (dto.status() == TicketStatus.RESOLVED &&
+                ticket.getResolvedAt() == null) {
+            ticket.setResolvedAt(LocalDateTime.now());
         }
-        t.setUpdatedAt(LocalDateTime.now());
-        return mapper.toDto(repo.save(t));
+
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return mapper.toDto(repo.save(ticket));
     }
 
     @Override
     public TicketDto assign(Long id, TicketAssignDto dto) {
-        Ticket t = repo.findById(id).orElseThrow(() -> new NotFoundException("Ticket not found"));
-        User tech = userRepo.findById(dto.technicianId())
+        Ticket ticket = repo.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ticket not found"));
+        User technician = userRepo.findById(dto.technicianId())
                 .orElseThrow(() -> new NotFoundException("Technician not found"));
-        t.setAssignedTechnician(tech);
-        t.setUpdatedAt(LocalDateTime.now());
-        return mapper.toDto(repo.save(t));
+
+        ticket.setAssignedTechnician(technician);
+        ticket.setUpdatedAt(LocalDateTime.now());
+        return mapper.toDto(repo.save(ticket));
     }
 
     @Override
     public void delete(Long id) {
-        if (!repo.existsById(id)) throw new NotFoundException("Ticket not found");
+        if (!repo.existsById(id)) {
+            throw new NotFoundException("Ticket not found");
+        }
         repo.deleteById(id);
     }
 
     @Override
     public Page<TicketDto> listGreen(int page, int size) {
-        return repo.findGreen(PageRequest.of(page, size, Sort.by("createdAt").descending())).map(mapper::toDto);
+        return repo.findGreen(pageRequest(page, size))
+                .map(mapper::toDto);
     }
 
     @Override
     public Page<TicketDto> listOrange(int page, int size) {
-        return repo.findOrange(PageRequest.of(page, size, Sort.by("createdAt").descending())).map(mapper::toDto);
+        return repo.findOrange(pageRequest(page, size))
+                .map(mapper::toDto);
     }
 
     @Override
     public Page<TicketDto> listRed(int page, int size) {
-        return repo.findRed(PageRequest.of(page, size, Sort.by("createdAt").descending())).map(mapper::toDto);
+        return repo.findRed(pageRequest(page, size))
+                .map(mapper::toDto);
+    }
+
+    private PageRequest pageRequest(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("createdAt").descending());
     }
 }
