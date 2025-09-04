@@ -1,16 +1,25 @@
 package com.hive.help.config;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.*;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.*;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@OpenAPIDefinition(
-        info = @Info(
-                title = "HelpHive API",
-                version = "v1",
-                description = "Role-based ticket management (Admin, Supervisor, Technician, User)"
-        )
-)
 @Configuration
 public class OpenApiConfig {
+
+        @Bean
+        public OpenAPI helpHiveOpenAPI() {
+                return new OpenAPI()
+                        .info(new Info().title("HelpHive API").version("v1"))
+                        .components(new Components().addSecuritySchemes(
+                                "bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        ))
+                        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+        }
 }

@@ -1,6 +1,20 @@
-# 🐝 HelpHive
+# HelpHive
 
 > A lightweight, role-based ticket management system for teams.  
+> Description
+> HelpHive – Technical Incident Management System
+
+HelpHive is a web application designed to manage technical support tickets in an organized and transparent way.
+Users can create tickets to report issues, which are then reviewed and assigned by supervisors or administrators.
+Technicians work on the assigned tickets, log their work, and add comments until the issue is resolved.
+
+Roles
+User: creates and tracks their own tickets.
+Technician: manages and resolves assigned tickets.
+Supervisor: monitors all tickets and assigns them to technicians.
+Administrator: full control over users, roles, and system settings.
+HelpHive ensures a clear workflow from problem reporting to resolution, improving communication and accountability across the team.
+
 > Built with **Spring Boot + MySQL**, secured with **JWT**, and delivered via **Docker**.
 
 ![CI](https://github.com/vitaflash/helphive/actions/workflows/docker.yml/badge.svg)
