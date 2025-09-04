@@ -12,20 +12,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    private final UserRepository userRepository;
+
+    private final UserRepository users;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User u = userRepository.findByEmail(email)
+        User u = users.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (!u.getActive()) {
-            throw new UsernameNotFoundException("User inactive: " + email);
-        }
-
-        List<SimpleGrantedAuthority> auth = List.of(new SimpleGrantedAuthority(u.getRole().name()));
-        return new org.springframework.security.core.userdetails.User(
-                u.getEmail(), u.getPassword(), auth
+        return new CustomUserPrincipal(
+                u.getId(),
+                u.getEmail(),
+                u.getPassword(),
+                Boolean.TRUE.equals(u.getActive()), // you renamed to getActive()
+                List.of(new SimpleGrantedAuthority("ROLE_" + u.getRole().name().replace("ROLE_", "")))
         );
     }
 }
