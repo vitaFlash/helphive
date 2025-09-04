@@ -2,11 +2,13 @@ package com.hive.help.controller;
 
 import com.hive.help.dto.ticket.*;
 import com.hive.help.service.TicketService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/tickets")
 @RequiredArgsConstructor
@@ -14,90 +16,91 @@ public class TicketController {
 
     private final TicketService service;
 
-    // ---- CREATE ----
+    // Create a ticket (authenticated users)
+    @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
     @PostMapping
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public TicketDto create(@RequestParam Long creatorId,
-                            @RequestBody TicketCreateDto dto) {
+    public TicketDto create(@RequestParam Long creatorId, @RequestBody TicketCreateDto dto) {
         return service.create(creatorId, dto);
     }
 
-    // ---- READ ----
-    @GetMapping("/{id}")
+    // Get a ticket by ID
     @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
+    @GetMapping("/{id}")
     public TicketDto get(@PathVariable Long id) {
         return service.get(id);
     }
 
+    // List all tickets (technician/supervisor/admin)
+    @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
     @GetMapping
-    @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
     public Page<TicketDto> listAll(@RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size) {
         return service.listAll(page, size);
     }
 
-    @GetMapping("/creator/{creatorId}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    // List tickets by creator
+    @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
+    @GetMapping("/by-creator/{creatorId}")
     public Page<TicketDto> listByCreator(@PathVariable Long creatorId,
                                          @RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "10") int size) {
         return service.listByCreator(creatorId, page, size);
     }
 
-    @GetMapping("/technician/{technicianId}")
-    @PreAuthorize("hasRole('TECHNICIAN') or hasRole('ADMIN')")
-    public Page<TicketDto> listByAssignee(@PathVariable Long technicianId,
+    // List tickets by assignee
+    @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
+    @GetMapping("/by-assignee/{techId}")
+    public Page<TicketDto> listByAssignee(@PathVariable Long techId,
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int size) {
-        return service.listByAssignee(technicianId, page, size);
+        return service.listByAssignee(techId, page, size);
     }
 
-    // ---- UPDATE ----
+    // Update ticket details
+    @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public TicketDto update(@PathVariable Long id,
-                            @RequestBody TicketUpdateDto dto) {
+    public TicketDto update(@PathVariable Long id, @RequestBody TicketUpdateDto dto) {
         return service.update(id, dto);
     }
 
-    @PatchMapping("/{id}/status")
+    // Update ticket status
     @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
-    public TicketDto updateStatus(@PathVariable Long id,
-                                  @RequestBody TicketStatusUpdateDto dto) {
+    @PatchMapping("/{id}/status")
+    public TicketDto updateStatus(@PathVariable Long id, @RequestBody TicketStatusUpdateDto dto) {
         return service.updateStatus(id, dto);
     }
 
+    // Assign a technician
+    @PreAuthorize("hasAnyRole('SUPERVISOR','ADMIN')")
     @PatchMapping("/{id}/assign")
-    @PreAuthorize("hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public TicketDto assign(@PathVariable Long id,
-                            @RequestBody TicketAssignDto dto) {
+    public TicketDto assign(@PathVariable Long id, @RequestBody TicketAssignDto dto) {
         return service.assign(id, dto);
     }
 
-    // ---- DELETE ----
-    @DeleteMapping("/{id}")
+    // Delete a ticket (admin only)
     @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
 
-    // ---- COLORS ----
+    // Traffic-light views
+    @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
     @GetMapping("/green")
-    @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
     public Page<TicketDto> listGreen(@RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size) {
         return service.listGreen(page, size);
     }
 
+    @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
     @GetMapping("/orange")
-    @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
     public Page<TicketDto> listOrange(@RequestParam(defaultValue = "0") int page,
                                       @RequestParam(defaultValue = "10") int size) {
         return service.listOrange(page, size);
     }
 
+    @PreAuthorize("hasAnyRole('TECHNICIAN','SUPERVISOR','ADMIN')")
     @GetMapping("/red")
-    @PreAuthorize("hasAnyRole('USER','TECHNICIAN','SUPERVISOR','ADMIN')")
     public Page<TicketDto> listRed(@RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size) {
         return service.listRed(page, size);
